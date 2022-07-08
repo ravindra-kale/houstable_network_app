@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import { IsNotEmpty } from 'class-validator';
 import { Address } from 'src/address/entities/address.entity';
-
 import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { Bill } from 'src/bill/entities/bill.entity';
 import { Hospital } from 'src/hospital/entities/hospital.entity';
@@ -28,6 +27,7 @@ export class Patient {
   @ManyToOne(() => PetType, (Pet_type) => Pet_type.patient, {
     cascade: true,
     eager: true,
+    onDelete: 'CASCADE',
   })
   pet_type: PetType;
 
@@ -42,6 +42,7 @@ export class Patient {
   @ManyToOne(() => Address, (address) => address.patient, {
     cascade: true,
     eager: true,
+    onDelete: 'CASCADE',
   })
   address: Address;
 
@@ -52,6 +53,7 @@ export class Patient {
   @ManyToOne(() => Hospital, (hospital) => hospital.patient, {
     cascade: true,
     eager: true,
+    onDelete: 'CASCADE',
   })
   hospital: Hospital;
 

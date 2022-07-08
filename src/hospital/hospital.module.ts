@@ -1,9 +1,12 @@
-import { Module } from '@nestjs/common';
+import { HostParam, Module } from '@nestjs/common';
 import { HospitalService } from './hospital.service';
-import { HospitalController } from './hospital.controller';
+
+import { Hospital } from './entities/hospital.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  controllers: [HospitalController],
-  providers: [HospitalService]
+  imports: [TypeOrmModule.forFeature([Hospital])],
+  providers: [HospitalService],
+  exports: [HospitalService],
 })
 export class HospitalModule {}
