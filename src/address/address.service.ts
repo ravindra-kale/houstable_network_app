@@ -46,7 +46,21 @@ export class AddressService {
             .send({ message: 'please send state in address object' });
       return await this.addressRepo.save(addrs);
     } catch (error) {
-      res.send(error);
+      res.send(error.massage);
+    }
+  }
+  async updateAddress(id, address: Address) {
+    try {
+      this.addressRepo.update(id, address);
+    } catch (error) {
+      throw error.massage();
+    }
+  }
+  async removeAddress(id: string) {
+    try {
+      await this.addressRepo.delete(id);
+    } catch (error) {
+      throw new error.massage();
     }
   }
   // findAll() {

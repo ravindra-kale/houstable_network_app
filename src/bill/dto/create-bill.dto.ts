@@ -1,11 +1,11 @@
 export interface CreateBillDto {
   amount: string;
 
-  appointmentId: string;
+  appointment_id: string;
 
-  patientId: string;
+  patient_id: string;
 
-  pet_type_Id: string;
+  pet_id: string;
 
   paid_status: string;
 

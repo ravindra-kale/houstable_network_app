@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Res,
+  Put,
 } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
@@ -15,6 +16,8 @@ import { Response } from 'express';
 import { AddressService } from 'src/address/address.service';
 import { PetTypeService } from 'src/pet_type/pet_type.service';
 import { HospitalService } from 'src/hospital/hospital.service';
+import { throwError } from 'rxjs';
+import { phone_validation } from 'src/utils/validator';
 
 @Controller('patient')
 export class PatientController {
@@ -26,12 +29,16 @@ export class PatientController {
   ) {}
 
   @Post()
-  async create(
+  async createPatient(
     @Body() createPatientDto: CreatePatientDto,
     @Res() res: Response,
   ) {
     try {
-      if (createPatientDto) {
+      if (
+        await this.patientService.checkPhoneNumberInDB(
+          Number(createPatientDto.phone_number),
+        )
+      ) {
         const patient: Patient = new Patient();
         createPatientDto.owner_name
           ? (patient.owner_name = createPatientDto.owner_name)
@@ -42,8 +49,9 @@ export class PatientController {
         createPatientDto.favourites
           ? (patient.favourites = createPatientDto.favourites)
           : res.status(400).send({ message: 'please send favourites number ' });
-        createPatientDto.phone_number
-          ? (patient.phone_number = createPatientDto.phone_number)
+        createPatientDto.phone_number &&
+        phone_validation(createPatientDto.phone_number.toString())
+          ? (patient.phone_number = Number(createPatientDto.phone_number))
           : res
               .status(400)
               .send({ massage: 'please send valid mobile number' });
@@ -55,6 +63,7 @@ export class PatientController {
           : res
               .status(400)
               .send({ message: 'please provide the valid address' });
+        console.log('hello world');
 
         createPatientDto.pet_type
           ? (patient.pet_type = await this.petTypeService.create(
@@ -76,30 +85,37 @@ export class PatientController {
         const data = await this.patientService.createPatient(patient);
         res.json(data);
       } else {
-        res.status(400).send('please send valid patient data');
+        res
+          .status(400)
+          .send('Phone number is already available :  ' + throwError);
       }
     } catch (error) {
-      res.send(error);
+      res.json(error.massage);
     }
   }
 
   @Get()
-  async findAll(): Promise<Patient[]> {
+  async findAllPatinet(): Promise<Patient[]> {
     return await this.patientService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Patient[]> {
+  async findOnePatient(@Param('id') id: string): Promise<Patient[]> {
     return await this.patientService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePatientDto: CreatePatientDto) {
-    return this.patientService.update(+id, updatePatientDto);
+  @Put(':id')
+  async updatePatientInfo(
+    @Param('id') id: string,
+    @Body() updatePatient: CreatePatientDto,
+    @Res() res: Response,
+  ) {
+    const data = await this.patientService.update(id, updatePatient, res);
+    res.send(data);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.patientService.remove(id);
+  removePatientInfo(@Param('id') id: string) {
+    return this.patientService.removePatientInfo(id);
   }
 }

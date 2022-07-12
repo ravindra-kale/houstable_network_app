@@ -9,16 +9,14 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
-  async tokenManager(@Body() user: any, @Res() res: Response): Promise<string> {
+  async tokenManager(@Body() user: any, @Res() res: Response) {
+    const pass = this.configService.get('PASSWORD');
+    const mail = this.configService.get('USEREMAIL');
+
     try {
-      if (
-        user.useremail == this.configService.get('USEREMAIL') &&
-        user.password == this.configService.get('PASSWORD')
-      ) {
-        return await this.jwtService.sign(
-          { user },
-          this.configService.get('TOKEN_SECRATE_KEY'),
-        );
+      if (user.useremail == mail && user.password == pass) {
+        const token = await this.jwtService.signAsync({ user });
+        res.send(token);
       } else {
         res.send({ massege: 'Please check useremail and password' });
       }

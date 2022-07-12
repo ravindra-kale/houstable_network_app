@@ -1,25 +1,53 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateBillDto } from './dto/create-bill.dto';
+import { Bill } from './entities/bill.entity';
 
 @Injectable()
 export class BillService {
-  create(createBillDto: CreateBillDto) {
-    return 'This action adds a new bill';
+  constructor(
+    @InjectRepository(Bill)
+    private billRepo: Repository<Bill>,
+  ) {}
+
+  async createBill(createBillDto: CreateBillDto): Promise<Bill> {
+    try {
+      return await this.billRepo.save(createBillDto);
+    } catch (error) {
+      return error.massage;
+    }
   }
 
-  findAll() {
-    return `This action returns all bill`;
+  async findAllBill(): Promise<Bill[]> {
+    try {
+      return await this.billRepo.find();
+    } catch (error) {
+      return error.massage;
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} bill`;
+  async findOneBill(id: number): Promise<Bill[]> {
+    try {
+      return await this.billRepo.find({ where: { id: id } });
+    } catch (error) {
+      return error.message;
+    }
   }
 
-  update(id: number, updateBillDto: CreateBillDto) {
-    return `This action updates a #${id} bill`;
+  async updateBill(id: number, updateBillDto: CreateBillDto) {
+    try {
+      return await this.billRepo.update(id, updateBillDto);
+    } catch (error) {
+      return error.massage;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} bill`;
+  async removeBill(id: number) {
+    try {
+      return await this, this.billRepo.delete(id);
+    } catch (error) {
+      return error.massage;
+    }
   }
 }

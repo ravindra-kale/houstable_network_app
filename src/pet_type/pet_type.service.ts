@@ -24,19 +24,23 @@ export class PetTypeService {
             .send({ message: 'please provide valid favourites number' });
       return await this.petTypeRepo.save(petinfo);
     } catch (error) {
-      res.send(error);
+      res.send(error.massage);
     }
   }
-  // findAll() {
-  //   return `This action returns all petType`;
-  // }
-  // findOne(id: number) {
-  //   return `This action returns a #${id} petType`;
-  // }
-  // update(id: number, updatePetTypeDto: UpdatePetTypeDto) {
-  //   return `This action updates a #${id} petType`;
-  // }
-  // remove(id: number) {
-  //   return `This action removes a #${id} petType`;
-  // }
+
+  async updatePetType(id: string, petType: PetType) {
+    try {
+      await this.petTypeRepo.update(id, petType);
+    } catch (error) {
+      throw new error.massage();
+    }
+  }
+
+  async removePetType(id: string) {
+    try {
+      await this.petTypeRepo.delete(id);
+    } catch (error) {
+      throw new error.massage();
+    }
+  }
 }

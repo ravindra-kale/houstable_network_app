@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -24,11 +25,16 @@ export class Patient {
   @Column()
   pet_name: string;
 
+  @IsNotEmpty()
+  @Column({ name: 'pet_id' })
+  petTypeId: string;
+
   @ManyToOne(() => PetType, (Pet_type) => Pet_type.patient, {
     cascade: true,
     eager: true,
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'pet_id' })
   pet_type: PetType;
 
   @IsNotEmpty()
@@ -39,22 +45,31 @@ export class Patient {
   @Column()
   owner_name: string;
 
+  @IsNotEmpty()
+  @Column({ name: 'address_id' })
+  addressId: string;
+
   @ManyToOne(() => Address, (address) => address.patient, {
     cascade: true,
     eager: true,
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'address_id' })
   address: Address;
 
   @IsNotEmpty()
   @Column({ unique: true, type: 'int8' })
   phone_number: number;
 
+  @IsNotEmpty()
+  @Column({ name: 'hospital_id' })
+  hospitalId: Hospital;
   @ManyToOne(() => Hospital, (hospital) => hospital.patient, {
     cascade: true,
     eager: true,
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'hospital_id' })
   hospital: Hospital;
 
   @IsNotEmpty()

@@ -10,6 +10,7 @@ import { HospitalModule } from './hospital/hospital.module';
 import { PetTypeModule } from './pet_type/pet_type.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { BillModule } from './bill/bill.module';
+// import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [

@@ -1,6 +1,6 @@
 import { Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Response } from 'express';
+import e, { Response } from 'express';
 import { throwError } from 'rxjs';
 
 import { Repository } from 'typeorm';
@@ -14,33 +14,45 @@ export class HospitalService {
     private hspitalRepo: Repository<Hospital>,
   ) {}
   async create(createHospitalDto: CreateHospitalDto, @Res() res: Response) {
-    const hospital = new Hospital();
-    createHospitalDto.name
-      ? (hospital.name = createHospitalDto.name)
-      : res
-          .status(400)
-          .send({ message: 'please provide haospital name in object' });
-    createHospitalDto.code
-      ? (hospital.code = createHospitalDto.code)
-      : res
-          .status(400)
-          .send({ message: 'please provide haospital code in object' });
-    return await this.hspitalRepo.save(hospital);
+    try {
+      const hospital = new Hospital();
+      createHospitalDto.name
+        ? (hospital.name = createHospitalDto.name)
+        : res
+            .status(400)
+            .send({ message: 'please provide haospital name in object' });
+      createHospitalDto.code
+        ? (hospital.code = createHospitalDto.code)
+        : res
+            .status(400)
+            .send({ message: 'please provide haospital code in object' });
+      return await this.hspitalRepo.save(hospital);
+    } catch (error) {
+      res.status(400).send(error.massage);
+    }
   }
 
-  findAll() {
-    return `This action returns all hospital`;
+  // findAll() {
+  //   return `This action returns all hospital`;
+  // }
+
+  // findOne(id: number) {
+  //   return `This action returns a #${id} hospital`;
+  // }
+
+  async updateHospital(id: string, updateHospitalDto: CreateHospitalDto) {
+    try {
+      await this.hspitalRepo.update(id, updateHospitalDto);
+    } catch (error) {
+      throw new error.massage();
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} hospital`;
-  }
-
-  update(id: number, updateHospitalDto: CreateHospitalDto) {
-    return `This action updates a #${id} hospital`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} hospital`;
+  async removeHospitalInfo(id: string) {
+    try {
+      await this.hspitalRepo.delete(id);
+    } catch (error) {
+      throw new error.massage();
+    }
   }
 }

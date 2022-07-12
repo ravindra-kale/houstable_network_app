@@ -22,7 +22,7 @@ export class Bill {
 
   @IsNotEmpty()
   @Column({ name: 'appointment_id' })
-  appointmentId: string;
+  appointment_id: string;
 
   @ManyToOne(() => Appointment, (appointment) => appointment.bill)
   @JoinColumn({ name: 'appointment_id' })
@@ -30,7 +30,7 @@ export class Bill {
 
   @IsNotEmpty()
   @Column({ name: 'patient_id' })
-  patientId: string;
+  patient_id: string;
 
   @ManyToOne((name) => Patient, (patient) => patient.bill)
   @JoinColumn({ name: 'patient_id' })
@@ -38,7 +38,7 @@ export class Bill {
 
   @IsNotEmpty()
   @Column({ name: 'pet_id' })
-  pet_type_Id: string;
+  pet_id: string;
 
   @ManyToOne(() => PetType, (pt_type) => pt_type.bill)
   @JoinColumn({ name: 'pet_id' })
