@@ -1,4 +1,4 @@
-import { Injectable, Res } from '@nestjs/common';
+import { HttpCode, HttpException, Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'express';
 import { AddressService } from 'src/address/address.service';
@@ -24,7 +24,7 @@ export class PatientService {
     try {
       return await this.patientRepo.save(createPatientDto);
     } catch (error) {
-      throw new error.massage();
+      return error.massage;
     }
   }
 
@@ -32,7 +32,7 @@ export class PatientService {
     try {
       return await this.patientRepo.find();
     } catch (error) {
-      return new error.massage();
+      return error.massage;
     }
   }
 
@@ -101,7 +101,7 @@ export class PatientService {
         return { message: 'Record updated successfully...!' };
       }
     } catch (error) {
-      res.status(400).send(error.massage);
+      res.send(error.massage);
     }
   }
 
@@ -129,12 +129,11 @@ export class PatientService {
       await this.addressService.removeAddress(addrsId[0].address_id);
       await this.petService.removePetType(petTypeId[0].pet_id);
       await this.hosptalService.removeHospitalInfo(hospitalId[0].hospital_id);
-
       if (data.affected > 0) {
         return { message: 'Record deleted successfully' };
       }
     } catch (error) {
-      return new error.massage();
+      return error.massage;
     }
   }
 

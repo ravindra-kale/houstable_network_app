@@ -31,15 +31,6 @@ export class HospitalService {
       res.status(400).send(error.massage);
     }
   }
-
-  // findAll() {
-  //   return `This action returns all hospital`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} hospital`;
-  // }
-
   async updateHospital(id: string, updateHospitalDto: CreateHospitalDto) {
     try {
       await this.hspitalRepo.update(id, updateHospitalDto);

@@ -31,7 +31,7 @@ import { AuthModule } from './auth/auth.module';
         database: configService.get('DB_DATABASE'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: configService.get('DB_SYNC'),
-        logging: true,
+        // logging: true,
       }),
       inject: [ConfigService],
     }),

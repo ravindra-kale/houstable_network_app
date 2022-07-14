@@ -9,6 +9,8 @@ import {
   Res,
   Put,
   UseGuards,
+  BadRequestException,
+  HttpException,
 } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
@@ -22,6 +24,7 @@ import { phone_validation } from 'src/utils/validator';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('patient')
+@UseGuards(JwtAuthGuard)
 export class PatientController {
   constructor(
     private readonly patientService: PatientService,
@@ -57,6 +60,7 @@ export class PatientController {
           : res
               .status(400)
               .send({ massage: 'please send valid mobile number' });
+
         createPatientDto.address
           ? (patient.address = await this.addresService.create(
               createPatientDto.address,
@@ -65,25 +69,27 @@ export class PatientController {
           : res
               .status(400)
               .send({ message: 'please provide the valid address' });
-        console.log('hello world');
 
-        createPatientDto.pet_type
-          ? (patient.pet_type = await this.petTypeService.create(
-              createPatientDto.pet_type,
-              res,
-            ))
-          : res
-              .status(400)
-              .send({ message: 'please provide the valid pet type object' });
-
-        createPatientDto.hospital
-          ? (patient.hospital = await this.hospitalService.create(
-              createPatientDto.hospital,
-              res,
-            ))
-          : res
-              .status(400)
-              .send({ message: 'please send valid hospital object' });
+        if (patient.address) {
+          createPatientDto.pet_type
+            ? (patient.pet_type = await this.petTypeService.create(
+                createPatientDto.pet_type,
+                res,
+              ))
+            : res
+                .status(400)
+                .send({ message: 'please provide the valid pet type object' });
+        }
+        if (patient.address && patient.pet_type) {
+          createPatientDto.hospital
+            ? (patient.hospital = await this.hospitalService.create(
+                createPatientDto.hospital,
+                res,
+              ))
+            : res
+                .status(400)
+                .send({ message: 'please send valid hospital object' });
+        }
         const data = await this.patientService.createPatient(patient);
         res.json(data);
       } else {
@@ -96,15 +102,24 @@ export class PatientController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get()
-  async findAllPatinet(): Promise<Patient[]> {
-    return await this.patientService.findAll();
+  async findAllPatinet() {
+    try {
+      return await this.patientService.findAll();
+    } catch (error) {
+      throw new HttpException(`error : ${error}`, 400);
+    }
   }
 
   @Get(':id')
-  async findOnePatient(@Param('id') id: string): Promise<Patient[]> {
-    return await this.patientService.findOne(id);
+  async findOnePatient(@Param('id') id: string) {
+    const data = await this.patientService.findOne(id);
+    if (data.length > 0) {
+      return data;
+    } else {
+      return { massage: 'patient not found...!' };
+    }
   }
 
   @Put(':id')

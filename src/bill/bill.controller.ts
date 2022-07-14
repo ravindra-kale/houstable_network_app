@@ -7,14 +7,17 @@ import {
   Delete,
   Put,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { checkValidUUID, dateIsValid } from 'src/utils/validator';
 import { BillService } from './bill.service';
 import { CreateBillDto } from './dto/create-bill.dto';
 import { Bill } from './entities/bill.entity';
 
 @Controller('bill')
+@UseGuards(JwtAuthGuard)
 export class BillController {
   constructor(private readonly billService: BillService) {}
 

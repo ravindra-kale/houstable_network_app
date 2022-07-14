@@ -14,9 +14,8 @@ export class AuthController {
   async login(@Body() user: any) {
     const email = this.configService.get('USEREMAIL');
     const password = this.configService.get('PASSWORD');
-
     if (user.useremail == email && user.password == password) {
-      return this.authService.login(user);
+      return await this.authService.login(user);
     } else {
       return { massage: 'please correct username and password' };
     }
