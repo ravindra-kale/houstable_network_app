@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Put,
@@ -32,7 +31,7 @@ export class BillController {
             massage: 'plese enter valid date_paid in format YYYY-MM-DD',
           });
       createBillDto.paid_status
-        ? (bill.paid_status = createBillDto.paid_status)
+        ? (bill.paid_status = createBillDto.paid_status.toLowerCase())
         : res.status(400).send({
             massage: 'please provide valid paid status like paid or unpaid',
           });
@@ -64,10 +63,10 @@ export class BillController {
     }
   }
 
-  @Get(':id')
-  findOneBill(@Param('id') id: number): Promise<Bill[]> {
+  @Get('/id/:id')
+  async findOneBill(@Param('id') id: number): Promise<Bill[]> {
     try {
-      return this.billService.findOneBill(id);
+      return await this.billService.findOneBill(id);
     } catch (error) {
       return error.massage;
     }
@@ -89,6 +88,93 @@ export class BillController {
   remove(@Param('id') id: string) {
     try {
       return this.billService.removeBill(+id);
+    } catch (error) {
+      return error.massage;
+    }
+  }
+
+  @Get('patient/:patient_id')
+  async getBillByPatientId(@Param('patient_id') patient_id: string) {
+    if (checkValidUUID(patient_id)) {
+      try {
+        return await this.billService.getBillByPatientId(patient_id);
+      } catch (error) {
+        return error.massage;
+      }
+    } else {
+      return { massage: 'please provide valid patient id uuid' };
+    }
+  }
+
+  @Get('/balanceByBillStatus')
+  async balance_By_Status_And_Date(@Body() data: any, @Res() res: Response) {
+    try {
+      if (data.status) {
+        if (
+          data.status == undefined ||
+          data.start_date == undefined ||
+          data.end_date == undefined
+        ) {
+          !data.staus
+            ? res.status(400).send({
+                massage: 'please provid valid status like paid or unpaid',
+              })
+            : '';
+          !data.start_date && dateIsValid(data.start_date)
+            ? res.status(400).send({
+                massage: 'please provid valid  start_date',
+              })
+            : '';
+          !data.end_date && dateIsValid(data.end_date)
+            ? res.status(400).send({ massage: 'please provide valid end_date' })
+            : '';
+        } else {
+          if (data.status == 'paid' || data.status == 'unpaid') {
+            res.send(await this.billService.balance_By_Status_And_Date(data));
+          } else {
+            res.status(400).send({
+              massage: 'please provid the status must be paid or unpaid',
+            });
+          }
+        }
+      } else {
+        res.status(400).send({
+          massgae: `please provide valid obeject in body like
+         {
+          status : paid,
+          start_date: YYYY-MM-DD,
+          end_date: YYYY-MM-DD
+         }
+      `,
+        });
+      }
+    } catch (error) {
+      res.send(error.massage);
+    }
+  }
+
+  @Get('balance')
+  async total_Hospital_Balance() {
+    try {
+      return await this.billService.total_Hospital_Balance();
+    } catch (error) {
+      return error.massage;
+    }
+  }
+
+  @Get('balanceEachPetType')
+  async balance_By_Each_pet() {
+    try {
+      return await this.billService.balance_By_Each_pet();
+    } catch (error) {
+      return error.massage;
+    }
+  }
+
+  @Get('popularPet')
+  async getPopularPetType() {
+    try {
+      return this.billService.getPopularPetType();
     } catch (error) {
       return error.massage;
     }

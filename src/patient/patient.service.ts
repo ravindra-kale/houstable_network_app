@@ -40,7 +40,7 @@ export class PatientService {
     try {
       return await this.patientRepo.find({ where: { id: id } });
     } catch (error) {
-      return error.massage();
+      return error.massage;
     }
   }
 

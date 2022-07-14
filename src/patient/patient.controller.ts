@@ -8,6 +8,7 @@ import {
   Delete,
   Res,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
@@ -18,6 +19,7 @@ import { PetTypeService } from 'src/pet_type/pet_type.service';
 import { HospitalService } from 'src/hospital/hospital.service';
 import { throwError } from 'rxjs';
 import { phone_validation } from 'src/utils/validator';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('patient')
 export class PatientController {
@@ -94,6 +96,7 @@ export class PatientController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async findAllPatinet(): Promise<Patient[]> {
     return await this.patientService.findAll();

@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
+
 import { PatientModule } from './patient/patient.module';
 import { AddressModule } from './address/address.module';
 import { HospitalModule } from './hospital/hospital.module';
@@ -11,10 +11,10 @@ import { PetTypeModule } from './pet_type/pet_type.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { BillModule } from './bill/bill.module';
 // import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    AuthModule,
     TypeOrmModule.forRootAsync({
       imports: [
         ConfigModule.forRoot({
@@ -41,6 +41,7 @@ import { BillModule } from './bill/bill.module';
     BillModule,
     PetTypeModule,
     HospitalModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

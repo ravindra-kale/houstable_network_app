@@ -1,14 +1,24 @@
 import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
+import { lastValueFrom } from 'rxjs';
 import { AuthService } from './auth.service';
 
 @Controller('login')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
-
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
   @Get()
-  async tokenManager(@Body() user: any, @Res() res: Response) {
-    const data = await this.authService.tokenManager(user, res);
-    res.send(data);
+  async login(@Body() user: any) {
+    const email = this.configService.get('USEREMAIL');
+    const password = this.configService.get('PASSWORD');
+
+    if (user.useremail == email && user.password == password) {
+      return this.authService.login(user);
+    } else {
+      return { massage: 'please correct username and password' };
+    }
   }
 }
