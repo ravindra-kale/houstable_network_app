@@ -13,20 +13,12 @@ export class HospitalService {
     @InjectRepository(Hospital)
     private hspitalRepo: Repository<Hospital>,
   ) {}
-  async create(createHospitalDto: CreateHospitalDto, @Res() res: Response) {
+  async createHospital(
+    createHospitalDto: CreateHospitalDto,
+    @Res() res: Response,
+  ) {
     try {
-      const hospital = new Hospital();
-      createHospitalDto.name
-        ? (hospital.name = createHospitalDto.name)
-        : res
-            .status(400)
-            .send({ message: 'please provide haospital name in object' });
-      createHospitalDto.code
-        ? (hospital.code = createHospitalDto.code)
-        : res
-            .status(400)
-            .send({ message: 'please provide haospital code in object' });
-      return await this.hspitalRepo.save(hospital);
+      return await this.hspitalRepo.save(createHospitalDto);
     } catch (error) {
       res.status(400).send(error.massage);
     }

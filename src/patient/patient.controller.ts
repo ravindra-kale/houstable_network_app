@@ -22,15 +22,18 @@ import { HospitalService } from 'src/hospital/hospital.service';
 import { throwError } from 'rxjs';
 import { phone_validation } from 'src/utils/validator';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Address } from 'src/address/entities/address.entity';
+import { PetType } from 'src/pet_type/entities/pet_type.entity';
+import { Hospital } from 'src/hospital/entities/hospital.entity';
 
 @Controller('patient')
 @UseGuards(JwtAuthGuard)
 export class PatientController {
   constructor(
     private readonly patientService: PatientService,
-    private addresService: AddressService,
-    private petTypeService: PetTypeService,
-    private hospitalService: HospitalService,
+    private readonly addresService: AddressService,
+    private readonly petTypeService: PetTypeService,
+    private readonly hospitalService: HospitalService,
   ) {}
 
   @Post()
@@ -61,34 +64,82 @@ export class PatientController {
               .status(400)
               .send({ massage: 'please send valid mobile number' });
 
-        createPatientDto.address
-          ? (patient.address = await this.addresService.create(
-              createPatientDto.address,
-              res,
-            ))
+        //address validation
+        const addrs = new Address();
+        const pet_type = new PetType();
+        const hospital = new Hospital();
+
+        createPatientDto.address.address1
+          ? (addrs.address1 = createPatientDto.address.address1)
           : res
               .status(400)
-              .send({ message: 'please provide the valid address' });
+              .send({ message: 'please send address1 in address object' });
+        createPatientDto.address.address2
+          ? (addrs.address2 = createPatientDto.address.address2)
+          : res
+              .status(400)
+              .send({ message: 'please send address2 in address object' });
+        createPatientDto.address.city
+          ? (addrs.city = createPatientDto.address.city)
+          : res
+              .status(400)
+              .send({ message: 'please send city in address object' });
+        createPatientDto.address.country
+          ? (addrs.country = createPatientDto.address.country)
+          : res
+              .status(400)
+              .send({ message: 'please send counrty in address object' });
+        createPatientDto.address.pincode
+          ? (addrs.pincode = createPatientDto.address.pincode)
+          : res
+              .status(400)
+              .send({ message: 'please send pincode in address object' });
+        createPatientDto.address.state
+          ? (addrs.state = createPatientDto.address.state)
+          : res
+              .status(400)
+              .send({ message: 'please send state in address object' });
 
-        if (patient.address) {
-          createPatientDto.pet_type
-            ? (patient.pet_type = await this.petTypeService.create(
-                createPatientDto.pet_type,
-                res,
-              ))
-            : res
-                .status(400)
-                .send({ message: 'please provide the valid pet type object' });
+        //validating pet type
+        createPatientDto.pet_type.type
+          ? (pet_type.type = createPatientDto.pet_type.type)
+          : res
+              .status(400)
+              .send({ message: 'please provide valid pet type in object' });
+        createPatientDto.pet_type.favourites
+          ? (pet_type.favourites = createPatientDto.pet_type.favourites)
+          : res.status(400).send({
+              message: 'please provide valid favourites number in object',
+            });
+        // validating hospital object
+        createPatientDto.hospital.name
+          ? (hospital.name = createPatientDto.hospital.name)
+          : res
+              .status(400)
+              .send({ message: 'please provide haospital name in object' });
+        createPatientDto.hospital.code
+          ? (hospital.code = createPatientDto.hospital.code)
+          : res
+              .status(400)
+              .send({ message: 'please provide haospital code in object' });
+
+        if (res.statusCode !== 400) {
+          patient.address = await this.addresService.createAddress(
+            createPatientDto.address,
+            res,
+          );
         }
-        if (patient.address && patient.pet_type) {
-          createPatientDto.hospital
-            ? (patient.hospital = await this.hospitalService.create(
-                createPatientDto.hospital,
-                res,
-              ))
-            : res
-                .status(400)
-                .send({ message: 'please send valid hospital object' });
+        if (res.statusCode !== 400) {
+          patient.pet_type = await this.petTypeService.createPetType(
+            createPatientDto.pet_type,
+            res,
+          );
+        }
+        if (res.statusCode !== 400) {
+          patient.hospital = await this.hospitalService.createHospital(
+            hospital,
+            res,
+          );
         }
         const data = await this.patientService.createPatient(patient);
         res.json(data);

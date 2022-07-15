@@ -1,7 +1,5 @@
 import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
-import { lastValueFrom } from 'rxjs';
 import { AuthService } from './auth.service';
 
 @Controller('login')
@@ -17,7 +15,7 @@ export class AuthController {
     if (user.useremail == email && user.password == password) {
       return await this.authService.login(user);
     } else {
-      return { massage: 'please correct username and password' };
+      return { massage: 'please provide correct username and password' };
     }
   }
 }
